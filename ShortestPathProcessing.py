@@ -54,12 +54,16 @@ class AccessMapPathProcessingAlgorithm(QgsProcessingAlgorithm):
         self.addParameter(QgsProcessingParameterNumber(
             "UPHILL", "Uphill",
             QgsProcessingParameterNumber.Double,
-            0.08))
+            0.08,
+            minValue = 0.0,
+            maxValue = 1.0))
             
         self.addParameter(QgsProcessingParameterNumber(
             "DOWNHILL", "Downhill",
             QgsProcessingParameterNumber.Double,
-            0.1))
+            0.1,
+            minValue = 0.0,
+            maxValue = 1.0))
             
         self.addParameter(QgsProcessingParameterBoolean(
             "AVOIDCURBS", "Avoid Curbs",
@@ -68,7 +72,9 @@ class AccessMapPathProcessingAlgorithm(QgsProcessingAlgorithm):
         self.addParameter(QgsProcessingParameterNumber(
             "STREETAVOIDANCE", "Street Avoidance",
             QgsProcessingParameterNumber.Double,
-            1))
+            1,
+            minValue = 0.0,
+            maxValue = 1.0))
 
     def processAlgorithm(self, parameters, context, feedback):
 
