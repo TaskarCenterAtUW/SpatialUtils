@@ -1,5 +1,6 @@
 import json, random
 from urllib.request import urlopen
+from urllib.error import HTTPError
 
 from qgis.PyQt.QtCore import QCoreApplication
 from qgis.core import (QgsProcessing,
@@ -96,7 +97,15 @@ class AccessMapTreeProcessingAlgorithm(QgsProcessingAlgorithm):
             layer_name2 = 'Cost'
             layer_name3 = 'Origin'
 
-            r = urlopen(url)
+            try:
+                r = urlopen(url)
+            except HTTPError as e:
+                if e.code == 422:
+                    feedback.pushInfo('Validation error: ' + e.read().decode())
+                    return
+                else:
+                    raise e
+            
             data = json.loads(r.read())
 
             if not "edges" in data:

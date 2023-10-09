@@ -1,6 +1,7 @@
 import json, random
 from qgis.core import QgsVectorLayer, QgsProject, QgsApplication, QgsSimpleMarkerSymbolLayerBase
 from urllib.request import urlopen
+from urllib.error import HTTPError
 
 def reachable_tree(lon, lat, uphill, downhill, avoidCurbs, streetAvoidance, max_cost, reverse):
     url = 'http://incremental-alpha.westus.cloudapp.azure.com/api/v1/routing/reachable_tree/custom.json?lon='+str(lon)+'&lat='+str(lat)+'&uphill='+str(uphill)+'&downhill='+str(downhill)+'&avoidCurbs='+str(avoidCurbs)+'&streetAvoidance='+str(streetAvoidance)+'&max_cost='+str(max_cost)
@@ -14,7 +15,15 @@ def reachable_tree(lon, lat, uphill, downhill, avoidCurbs, streetAvoidance, max_
     layer_name2 = 'Cost'
     layer_name3 = 'Origin'
 
-    r = urlopen(url)
+    try:
+        r = urlopen(url)
+    except HTTPError as e:
+        if e.code == 422:
+            print('Validation error: ' + e.read().decode())
+            return
+        else:
+            raise e
+    
     data = json.loads(r.read())
     #print(data["origin"])
 

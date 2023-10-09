@@ -1,6 +1,7 @@
 import json, random
 from qgis.core import QgsVectorLayer, QgsProject, QgsApplication, QgsSimpleMarkerSymbolLayerBase
 from urllib.request import urlopen
+from urllib.error import HTTPError
 
 def shortest_path(lon1, lat1, lon2, lat2, uphill, downhill, avoidCurbs, streetAvoidance):
     url = 'http://incremental-alpha.westus.cloudapp.azure.com/api/v1/routing/shortest_path/custom.json?&lon1='+str(lon1)+'&lat1='+str(lat1)+'&lon2='+str(lon2)+'&lat2='+str(lat2)+'&uphill='+str(uphill)+'&downhill='+str(downhill)+'&avoidCurbs='+str(avoidCurbs)+'&streetAvoidance='+str(streetAvoidance)+'&timestamp=0'
@@ -14,7 +15,15 @@ def shortest_path(lon1, lat1, lon2, lat2, uphill, downhill, avoidCurbs, streetAv
     layer_name2 = 'Origin'
     layer_name3 = 'Destination'
 
-    r = urlopen(url)
+    try:
+        r = urlopen(url)
+    except HTTPError as e:
+        if e.code == 422:
+            print('Validation error: ' + e.read().decode())
+            return
+        else:
+            raise e
+    
     data = json.loads(r.read())
     
     if not "routes" in data:
